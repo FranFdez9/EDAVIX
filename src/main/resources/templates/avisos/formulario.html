@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title th:text="${titulo}">Formulario de aviso</title>
+    <style>
+        * { box-sizing: border-box; }
+        body { margin: 0; font-family: Arial, sans-serif; background-color: #f5f6f8; color: #212529; }
+        nav { background-color: #212529; color: white; padding: 16px 0; }
+        .contenedor { width: 90%; max-width: 850px; margin: auto; }
+        .navbar { display: flex; justify-content: space-between; align-items: center; }
+        .navbar a { color: white; text-decoration: none; }
+        .marca { font-size: 20px; font-weight: bold; }
+        .navegacion { display: flex; align-items: center; gap: 25px; flex-wrap: wrap; }
+        .navegacion a { font-size: 14px; }
+        .navegacion a:hover { color: #adb5bd; }
+        main { padding-top: 45px; padding-bottom: 40px; }
+        h1 { font-size: 28px; margin-bottom: 8px; }
+        .descripcion { color: #6c757d; margin-bottom: 25px; }
+        .formulario-contenedor { background-color: white; padding: 30px; border-radius: 6px; box-shadow: 0 2px 6px rgba(0,0,0,.08); }
+        .campo { margin-bottom: 20px; }
+        label { display: block; font-weight: bold; margin-bottom: 8px; }
+        input, textarea, select { width: 100%; padding: 11px; border: 1px solid #ced4da; border-radius: 5px; font-size: 14px; font-family: Arial, sans-serif; }
+        textarea { resize: vertical; min-height: 100px; }
+        input:focus, textarea:focus, select:focus { outline: none; border-color: #86b7fe; box-shadow: 0 0 0 3px rgba(13,110,253,.15); }
+        .error { color: #dc3545; font-size: 13px; margin-top: 6px; }
+        .acciones { display: flex; justify-content: space-between; gap: 10px; margin-top: 25px; }
+        .boton { display: inline-block; padding: 11px 17px; border-radius: 5px; text-decoration: none; font-size: 14px; cursor: pointer; border: 1px solid; }
+        .boton-guardar { background-color: #0d6efd; color: white; border-color: #0d6efd; }
+        .boton-cancelar { background-color: white; color: #6c757d; border-color: #6c757d; }
+        .boton:hover { opacity: .85; }
+        @media (max-width: 700px) {
+            .navbar { gap: 15px; flex-wrap: wrap; }
+            .navegacion { gap: 15px; }
+        }
+    </style>
+</head>
+<body>
+<nav>
+    <div class="contenedor navbar">
+        <a class="marca" th:href="@{/avisos}" th:text="#{app.nombre}">EDAVIX</a>
+        <div class="navegacion">
+            <a th:href="@{/avisos}" th:text="#{nav.avisos}">Gestión de avisos</a>
+            <a th:href="@{/obras}" th:text="#{nav.obras}">Gestión de obras</a>
+            <span>
+                <a th:href="@{/avisos/nuevo(lang='es')}" th:text="#{idioma.es}">ES</a>
+                |
+                <a th:href="@{/avisos/nuevo(lang='en')}" th:text="#{idioma.en}">EN</a>
+            </span>
+        </div>
+    </div>
+</nav>
+
+<main class="contenedor">
+    <h1 th:text="${titulo}">Formulario de aviso</h1>
+    <p class="descripcion" th:text="#{aviso.formularioDescripcion}">
+        Introduce los datos del aviso y selecciona su obra.
+    </p>
+
+    <div class="formulario-contenedor">
+        <form th:action="${accion}" th:object="${aviso}" method="post">
+            <input type="hidden" th:field="*{idAviso}">
+
+            <div class="campo">
+                <label for="tipo" th:text="#{aviso.tipoLabel}">Tipo de aviso:</label>
+                <input type="text" id="tipo" th:field="*{tipo}" th:placeholder="#{aviso.tipoPlaceholder}">
+                <p class="error" th:if="${#fields.hasErrors('tipo')}" th:errors="*{tipo}"></p>
+            </div>
+
+            <div class="campo">
+                <label for="mensaje" th:text="#{aviso.mensajeLabel}">Mensaje:</label>
+                <textarea id="mensaje" th:field="*{mensaje}" th:placeholder="#{aviso.mensajePlaceholder}"></textarea>
+                <p class="error" th:if="${#fields.hasErrors('mensaje')}" th:errors="*{mensaje}"></p>
+            </div>
+
+            <div class="campo">
+                <label for="fecha" th:text="#{aviso.fechaLabel}">Fecha:</label>
+                <input type="datetime-local" id="fecha" th:field="*{fecha}">
+                <p class="error" th:if="${#fields.hasErrors('fecha')}" th:errors="*{fecha}"></p>
+            </div>
+
+            <div class="campo">
+                <label for="leido" th:text="#{aviso.estadoLabel}">Estado:</label>
+                <select id="leido" th:field="*{leido}">
+                    <option value="" th:text="#{aviso.seleccionarEstado}">Selecciona un estado</option>
+                    <option value="true" th:text="#{aviso.leido}">Leído</option>
+                    <option value="false" th:text="#{aviso.pendiente}">Pendiente</option>
+                </select>
+                <p class="error" th:if="${#fields.hasErrors('leido')}" th:errors="*{leido}"></p>
+            </div>
+
+            <div class="campo">
+                <label for="idObra" th:text="#{aviso.obraLabel}">Obra:</label>
+                <select id="idObra" th:field="*{idObra}">
+                    <option value="" th:text="#{aviso.seleccionarObra}">Selecciona una obra</option>
+                    <option th:each="obra : ${obras}" th:value="${obra.idObra}" th:text="${obra.nombre}"></option>
+                </select>
+                <p class="error" th:if="${#fields.hasErrors('idObra')}" th:errors="*{idObra}"></p>
+            </div>
+
+            <div class="acciones">
+                <a th:href="@{/avisos}" class="boton boton-cancelar" th:text="#{accion.volver}">Volver</a>
+                <button type="submit" class="boton boton-guardar" th:text="#{aviso.guardar}">Guardar aviso</button>
+            </div>
+        </form>
+    </div>
+</main>
+</body>
+</html>
